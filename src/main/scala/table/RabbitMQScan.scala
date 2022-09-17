@@ -1,7 +1,7 @@
 package eu.navispeed.rabbitmq
 package table
 
-import com.rabbitmq.client._
+import eu.navispeed.rabbitmq.client.BasicRabbitMQClient
 import net.liftweb.json._
 import org.apache.spark.sql.connector.read.streaming.{MicroBatchStream, Offset}
 import org.apache.spark.sql.connector.read.{InputPartition, PartitionReaderFactory, Scan}
@@ -13,22 +13,16 @@ import java.util.concurrent.atomic.AtomicLong
 import scala.collection.JavaConverters
 import scala.util.control.Breaks._
 
-class RabbitMQScan(schema: StructType, configuration: Configuration) extends Scan {
+private[table] class RabbitMQScan(schema: StructType, configuration: Configuration) extends Scan {
 
-  private val factory = new ConnectionFactory()
-  private val connection = factory.newConnection()
-  private val channel: Channel = connection.createChannel()
   private val currentOffset = new AtomicLong()
   private val buffer = new ConcurrentLinkedDeque[(Long, String, () => Unit)]()
   private implicit val formats: DefaultFormats.type = DefaultFormats
+  private val rmqClient = new BasicRabbitMQClient(configuration)
+
+  rmqClient.listenQueue(configuration.queueName, (body, ack) => buffer.push((currentOffset.getAndIncrement(), body, ack)))
 
   override def readSchema(): StructType = schema
-
-  channel.basicConsume("test", false, new DefaultConsumer(channel) {
-    override def handleDelivery(consumerTag: String, envelope: Envelope, properties: AMQP.BasicProperties, body: Array[Byte]): Unit = {
-      buffer.push((currentOffset.incrementAndGet(), new String(body), () => channel.basicAck(envelope.getDeliveryTag, false)))
-    }
-  })
 
   override def toMicroBatchStream(checkpointLocation: String): MicroBatchStream = {
     new MicroBatchStream {
@@ -64,8 +58,7 @@ class RabbitMQScan(schema: StructType, configuration: Configuration) extends Sca
       }
 
       override def stop(): Unit = {
-        channel.close()
-        connection.close()
+        rmqClient.stop()
       }
     }
   }

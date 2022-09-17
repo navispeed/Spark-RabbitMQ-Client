@@ -12,7 +12,7 @@ import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import java.util
 
 class RabbitMQTable(sparkSession: SparkSession) extends Table with SupportsRead {
-  override def name(): String = "rabbitmq"
+  override def name(): String = "client"
 
   override def schema(): StructType = SCHEMA
 
