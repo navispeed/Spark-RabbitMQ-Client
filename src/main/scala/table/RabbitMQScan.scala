@@ -1,7 +1,8 @@
 package eu.navispeed.rabbitmq
 package table
 
-import eu.navispeed.rabbitmq.client.BasicRabbitMQClient
+import client.BasicRabbitMQClient
+
 import net.liftweb.json._
 import org.apache.spark.sql.connector.read.streaming.{MicroBatchStream, Offset}
 import org.apache.spark.sql.connector.read.{InputPartition, PartitionReaderFactory, Scan}

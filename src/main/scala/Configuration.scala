@@ -6,7 +6,7 @@ import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
 import scala.collection.JavaConverters
 
-case class Configuration(hostname: String = "guest", port: Integer = 5672, user: String = "guest",
+case class Configuration(hostname: String = "localhost", port: Integer = 5672, user: String = "guest",
                          password: String = "guest", virtualHost: String = "/", useSsl: Boolean = false,
                          prefetchCount: Integer = 0, queueName: String) extends RabbitMQConfiguration() {
 }
@@ -28,7 +28,7 @@ object Configuration {
     )
   }
 
-  def fromMap(options: Map[String, String]): Configuration = {
+  def from(options: Map[String, String]): Configuration = {
     from(new CaseInsensitiveStringMap(JavaConverters.mapAsJavaMap(options)))
   }
 }

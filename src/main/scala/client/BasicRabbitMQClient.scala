@@ -2,7 +2,7 @@ package eu.navispeed.rabbitmq
 package client
 
 import com.rabbitmq.client.AMQP.BasicProperties
-import com.rabbitmq.client.{AMQP, Channel, ConnectionFactory, DefaultConsumer, Envelope}
+import com.rabbitmq.client._
 
 class BasicRabbitMQClient(configuration: Configuration) {
   private val factory = new ConnectionFactory()
@@ -30,7 +30,7 @@ class BasicRabbitMQClient(configuration: Configuration) {
   }
 
   def send(exchange: String, body: String): Unit = {
-    channel.basicPublish(exchange, body.hashCode.toString, new BasicProperties(), body.getBytes)
+    channel.basicPublish(exchange, "#", new BasicProperties(), body.getBytes)
   }
 
   def stop(): Unit = {
