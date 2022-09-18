@@ -18,3 +18,7 @@ This project contain a Spark 3.x custom source so that Spark can receive message
       .start()
       .awaitTermination()
 ```
+
+## Testing it
+
+You need to have a local RabbitMQ with the default configuration & to have a queue and an exchange named "test".
