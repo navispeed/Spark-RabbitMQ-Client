@@ -1,7 +1,6 @@
 package eu.navispeed.rabbitmq
 package client
 
-import com.rabbitmq.client.AMQP.BasicProperties
 import com.rabbitmq.client._
 
 class BasicRabbitMQClient(configuration: Configuration) {
@@ -27,10 +26,6 @@ class BasicRabbitMQClient(configuration: Configuration) {
         action(new String(body), () => channel.basicAck(envelope.getDeliveryTag, false))
       }
     })
-  }
-
-  def send(exchange: String, body: String): Unit = {
-    channel.basicPublish(exchange, "#", new BasicProperties(), body.getBytes)
   }
 
   def stop(): Unit = {
